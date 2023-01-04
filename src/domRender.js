@@ -1,4 +1,4 @@
-// Keep track of current project tab
+// Keep track of current project tab - should be handled on index.js
 // Re-render dom to new project tab when a project is created or task is added to a project
 // If the current tab is the same project that the task is added to, don't re-render everything
 // Control rendering when user clicks on a different project tab
@@ -15,11 +15,17 @@ const domRender = (() => {
     }
 
     const displayProject = (project) => {
-        //
+        if (contentContainer.hasChildNodes()) {
+            while (contentContainer.firstChild) {
+                contentContainer.removeChild(contentContainer.firstChild);
+            }
+        }
+        project.tasks.forEach(task => contentContainer.appendChild(domStuff.addTaskToDOM(task)));
     }
 
     return {
-        displayTask
+        displayTask,
+        displayProject
     }
 })();
 
