@@ -1,0 +1,57 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <h1>Eventually...</h1>
+            <h2>A Todo List</h2>
+        </header>
+        <div class="side-bar">
+            <h3>Projects</h3>
+        </div>
+        <div class="task-area">
+            <div id="content"></div>
+            <div class="new-task">
+                <form action="#" autocomplete="off">
+                    <label for="title">
+                        <input type="text" id="title" placeholder="New Task" name="title" required>
+                    </label>
+                    <label for="desc">
+                        <input type="text" id="desc" placeholder="Description" name="desc" required>
+                    </label>
+                    <label for="due">
+                        <input type="date" id="due" name="due">
+                    </label>
+                    <label for="priority">
+                        <select name="priority" id="priority">
+                            <option value="none">None</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </label>
+                    <label for="project">
+                        <input type="text" id="project" placeholder="Project" name="project">
+                    </label>
+                    <label for="completed">
+                        <input class="completed" type="checkbox" id="completed" name="completed">
+                    </label>
+                    <button type="submit">Add Task</button>
+                    <button type="reset" class="close">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
+
+<!--
+    title, description, dueDate, priority, completed
+-->
