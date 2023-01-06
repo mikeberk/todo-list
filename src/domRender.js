@@ -23,9 +23,19 @@ const domRender = (() => {
         project.tasks.forEach(task => contentContainer.appendChild(domStuff.addTaskToDOM(task)));
     }
 
+    const displayAllTasks = (tasks) => {
+        if (contentContainer.hasChildNodes()) {
+            while (contentContainer.firstChild) {
+                contentContainer.removeChild(contentContainer.firstChild);
+            }
+        }
+        tasks.forEach(task => contentContainer.appendChild(domStuff.addTaskToDOM(task)));
+    }
+
     return {
         displayTask,
-        displayProject
+        displayProject,
+        displayAllTasks
     }
 })();
 

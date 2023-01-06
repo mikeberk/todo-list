@@ -11,6 +11,9 @@ const form = document.querySelector('form');
 // initialize projects object for storing projects
 let projects = {};
 
+// initialize array for tasks without projects
+let remainingTasks = [];
+
 // static test
 let taskOne = domStuff.addTaskToDOM(new Task('Go To Gym', '1 hour exercise', '8/24/2022', 'high', true));
 
@@ -37,16 +40,19 @@ const createTask = (e) => {
             projects[newProject.name] = newProject;
             sideBarContainer.appendChild(domStuff.addProjectToDOM(newProject));
         }
+    } else {
+        remainingTasks.push(newTask);
     }
 
     if (project) {
         domRender.displayProject(projects[project]);
     } else {
-        // need to handle project-less tasks:
-        // option 1. create a generic task array to hold all tasks
-        // option 2. alternatively, get rid of projects array and replace with all tasks. project becomes a prop of tasks?
-        // option 3. create a project-less project to house the remaining tasks. this is probably the best option :]
-        domRender.displayTask(newTask);
+        let allTasks = [...remainingTasks];
+        for (let prj in projects) {
+            allTasks.push(...projects[prj].tasks)
+        }
+        // sort the array of all tasks?
+        domRender.displayAllTasks(allTasks);
     }
     
     form.reset();
