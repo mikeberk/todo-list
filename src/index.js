@@ -19,6 +19,30 @@ let taskOne = domStuff.addTaskToDOM(new Task('Go To Gym', '1 hour exercise', '8/
 
 contentContainer.appendChild(taskOne);
 
+const deleteTask = (e) => {
+    let taskName = e.target.dataset.delete;
+    let remIndex = remainingTasks.map(e => e.title).indexOf(taskName);
+    if (remIndex > -1) {
+        remainingTasks.splice(remIndex, 1)
+        let allTasks = [...remainingTasks];
+        for (let prj in projects) {
+            allTasks.push(...projects[prj].tasks)
+        }
+        // sort the array of all tasks by the timestamp they were added
+        allTasks.sort((a, b) => a.taskAdded - b.taskAdded);
+
+        domRender.displayAllTasks(allTasks);
+    } else {
+        for (let key of Object.keys(projects)) {
+           //if (projects[key].map(e => e.title).indexOf(taskName) > -1) {
+           if (projects[key].indexOfTask(taskName) > -1) {
+            projects[key].removeTask(taskName)
+            domRender.displayProject(projects[key]);
+           }
+        }
+    }
+}
+
 // user input test
 const createTask = (e) => {
     e.preventDefault();
@@ -51,12 +75,17 @@ const createTask = (e) => {
         for (let prj in projects) {
             allTasks.push(...projects[prj].tasks)
         }
-        // sort the array of all tasks?
+        // sort the array of all tasks by the timestamp they were added
+        allTasks.sort((a, b) => a.taskAdded - b.taskAdded);
+
         domRender.displayAllTasks(allTasks);
     }
     
     form.reset();
+    const deleteBtns = document.querySelectorAll(".delete-btn");
+    deleteBtns.forEach(btn => addEventListener('click', deleteTask));
 }
+
 
 // title, description, dueDate, priority, completed)
 let exercise = new Project('exercise', []);

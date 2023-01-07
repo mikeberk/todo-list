@@ -25,12 +25,19 @@ const domStuff = (() => {
         let taskPrio = createHtmlElement('p', priority, 'task-prio');
         let taskCompleted = createHtmlElement('p', task.completed, 'task-completed');
 
+        let editBtn = createHtmlElement('button', 'Edit', 'edit-btn');
+        editBtn.dataset.edit = task.title;
+        let deleteBtn = createHtmlElement('button', 'Delete', 'delete-btn');
+        deleteBtn.dataset.delete = task.title;
+
         let taskContainer = createHtmlElement('div', null, 'task-container');
         taskContainer.appendChild(taskPrio);
         taskContainer.appendChild(taskName);
         taskContainer.appendChild(taskDesc);
         taskContainer.appendChild(taskDue);
         taskContainer.appendChild(taskCompleted);
+        taskContainer.appendChild(editBtn);
+        taskContainer.appendChild(deleteBtn);
 
         return taskContainer;
     }
@@ -40,6 +47,7 @@ const domStuff = (() => {
         let projectElem = createHtmlElement('p', project._name, 'project-name');
         return projectElem;
     }
+
 
     return {
         addTaskToDOM,

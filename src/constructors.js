@@ -5,6 +5,7 @@ class Task {
         this.dueDate = dueDate;
         this.priority = priority;
         this.completed = completed;
+        this.taskAdded = Date.now();
     }
 }
 
@@ -32,6 +33,15 @@ class Project {
 
     addTask(task) {
         return this._tasks.push(task);
+    }
+
+    removeTask(task) {
+        let index = this._tasks.map(e => e.title).indexOf(task);
+        return this._tasks.splice(index, 1);
+    }
+
+    indexOfTask(task) {
+        return this._tasks.map(e => e.title).indexOf(task);
     }
 }
 
