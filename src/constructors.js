@@ -7,6 +7,28 @@ class Task {
         this.completed = completed;
         this.taskAdded = Date.now();
     }
+
+    set setTitle(newTitle) {
+        if (newTitle === '') {
+            console.log('The title cannot be empty');
+            return;
+        } 
+        return this._title = newTitle;
+    }
+
+    set setDescription(newDesc) {
+        return this._description = newDesc;
+    }
+
+    set setDueDate(newDueDate) {
+        return this._dueDate = newDueDate;
+    }
+
+    set setPriority(newPriority) {
+        return this._priority = newPriority;
+    }
+
+    // set completed 
 }
 
 class Project {
@@ -27,8 +49,7 @@ class Project {
         newName = newName.trim();
         if (newName === '') {
             console.log('The name cannot be empty');
-        }
-        this._name = newName;
+        } else {this._name = newName;}
     }
 
     addTask(task) {

@@ -6,7 +6,7 @@ import { domRender } from "./domRender"
 
 const contentContainer = document.getElementById('content');
 const sideBarContainer = document.querySelector('.side-bar');
-const form = document.querySelector('form');
+const newTaskForm = document.querySelector('.new-task-form');
 
 // initialize projects object for storing projects
 let projects = {};
@@ -39,6 +39,33 @@ const deleteTask = (e) => {
             projects[key].removeTask(taskName)
             domRender.displayProject(projects[key]);
            }
+        }
+    }
+}
+
+const editTask = (e) => {
+    // target the relevant div.task-container
+    // remove children
+    // call function to build the edit form
+    // need another function for "save task"
+    // function for "cancel" that resets the form but does not modify the task properties and re-displays task to DOM
+    
+    let taskName = e.target.dataset.edit;
+    console.log(e.target.parentElement);
+
+
+    let remIndex = remainingTasks.map(e => e.title).indexOf(taskName);
+    if (remIndex > -1) {
+        let task = remainingTasks[remIndex];
+        domRender.displayEditForm(task);
+    } else {
+        for (let key of Object.keys(projects)) {
+            if (projects[key].indexOfTask(taskName) > -1) {
+
+                // set task equal to the task found in project's task array. need to figure out correct syntax
+                let task = projects[key].tasks[projects[key].indexOfTask(taskName)];
+                domRender.displayEditForm(task,projects[key]);
+            }
         }
     }
 }
@@ -81,9 +108,12 @@ const createTask = (e) => {
         domRender.displayAllTasks(allTasks);
     }
     
-    form.reset();
+    newTaskForm.reset();
     const deleteBtns = document.querySelectorAll(".delete-btn");
     deleteBtns.forEach(btn => addEventListener('click', deleteTask));
+
+    const editBtns = document.querySelectorAll(".edit-btn");
+    editBtns.forEach(btn => addEventListener('click', editTask));
 }
 
 
@@ -98,7 +128,7 @@ console.log(exercise);
 
 sideBarContainer.appendChild(domStuff.addProjectToDOM(exercise));
 
-form.addEventListener('submit', createTask);
+newTaskForm.addEventListener('submit', createTask);
 
 /*
 + Need to add data attribute to each task and project that corresponds to the index in the respective array

@@ -32,10 +32,20 @@ const domRender = (() => {
         tasks.forEach(task => contentContainer.appendChild(domStuff.addTaskToDOM(task)));
     }
 
+    const displayEditForm = (task, proj, container) => {
+        if (container.hasChildNodes()) {
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+        }
+        container.appendChild(domStuff.createEditForm(task, proj));
+    }
+
     return {
         displayTask,
         displayProject,
-        displayAllTasks
+        displayAllTasks,
+        displayEditForm
     }
 })();
 
