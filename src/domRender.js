@@ -10,20 +10,13 @@ const contentContainer = document.getElementById('content');
 const sideBarContainer = document.querySelector('.side-bar');
 
 const domRender = (() => {
-    const displayTask = (task) => {
-        contentContainer.appendChild(domStuff.addTaskToDOM(task));
+
+    const displayProjects = (projects) => {
+        sideBarContainer.innerHTML = `<h3>Projects</h3>`;
+        projects.forEach(p => sideBarContainer.appendChild(domStuff.addProjectToDOM(p)));
     }
 
-    const displayProject = (project) => {
-        if (contentContainer.hasChildNodes()) {
-            while (contentContainer.firstChild) {
-                contentContainer.removeChild(contentContainer.firstChild);
-            }
-        }
-        project.tasks.forEach(task => contentContainer.appendChild(domStuff.addTaskToDOM(task)));
-    }
-
-    const displayAllTasks = (tasks) => {
+    const displayTasks = (tasks) => {
         if (contentContainer.hasChildNodes()) {
             while (contentContainer.firstChild) {
                 contentContainer.removeChild(contentContainer.firstChild);
@@ -42,9 +35,8 @@ const domRender = (() => {
     }
 
     return {
-        displayTask,
-        displayProject,
-        displayAllTasks,
+        displayProjects,
+        displayTasks,
         displayEditForm
     }
 })();

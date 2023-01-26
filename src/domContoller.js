@@ -74,6 +74,54 @@ const domStuff = (() => {
     }
 
     const addTaskToDOM = (task) => {
+        const todoItem = document.createElement('div');
+		todoItem.classList.add('todo-item');
+
+        const taskName = document.createElement('input');
+        taskName.setAttribute('type', 'text');
+        taskName.setAttribute('name', 'title');
+        taskName.value = task.title;
+        taskName.readOnly = true;
+
+        const taskDesc = document.createElement('input');
+        taskDesc.setAttribute('type', 'text');
+        taskDesc.setAttribute('name', 'desc');
+        taskDesc.value = task.description;
+        taskDesc.readOnly = true;
+
+        const taskDue = document.createElement('input');
+        taskDue.setAttribute('type', 'date');
+        taskDue.setAttribute('name', 'due');
+        taskDue.value = task.dueDate;
+        taskDue.readOnly = true;
+
+        const taskPrio = document.createElement('select');
+        taskPrio.setAttribute('name', 'priority');
+        let prioOptions = ['None', 'High', 'Medium', 'Low'];
+        for (let i = 0; i < prioOptions.length; i++) {
+            let option = document.createElement('option');
+            option.value = prioOptions[i].toLowerCase();
+            option.textContent = prioOptions[i];
+            taskPrio.appendChild(option);
+        }
+        let currentPrio = task.priority;
+        for (let i, j = 0; i = taskPrio.options[j]; j++) {
+            if(i.value == currentPrio) {
+              taskPrio.selectedIndex = j;
+              break;
+            }
+        }
+        taskPrio.disabled = true;
+
+        todoItem.appendChild(taskPrio);
+        todoItem.appendChild(taskName);
+        todoItem.appendChild(taskDesc);
+        todoItem.appendChild(taskDue);
+
+        return todoItem;
+    }
+/*
+    const addTaskToDOM = (task) => {
         // use createHtmlElement to add each task prop to a container
         // props: title, description, dueDate, priority, completed
         let priority = task.priority == 'high' ? '!!!'
@@ -104,10 +152,10 @@ const domStuff = (() => {
 
         return taskContainer;
     }
-
+*/
     const addProjectToDOM = (project) => {
         //project.name
-        let projectElem = createHtmlElement('p', project._name, 'project-name');
+        let projectElem = createHtmlElement('p', project, 'project-name');
         return projectElem;
     }
 

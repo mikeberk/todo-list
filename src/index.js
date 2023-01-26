@@ -1,23 +1,21 @@
-import { domStuff } from "./domContoller";
 import { Task } from "./constructors";
-import { Project } from "./constructors";
 import { format } from "date-fns";
 import { domRender } from "./domRender"
 
-const contentContainer = document.getElementById('content');
-const sideBarContainer = document.querySelector('.side-bar');
 const newTaskForm = document.querySelector('.new-task-form');
 
-// initialize projects object for storing projects
-let projects = {};
-
-// initialize array for tasks without projects
-let remainingTasks = [];
+// initialize projects and tasks arrays. when moving to local store, update to seed with existing tasks/projects
+let projectsArr = [];
+let tasksArr = [];
 
 // static test
-let taskOne = domStuff.addTaskToDOM(new Task('Go To Gym', '1 hour exercise', '8/24/2022', 'high', true));
+let taskOne = new Task('Go To Gym', '1 hour exercise', '8/24/2022', 'high', 'exercise', false);
+tasksArr.push(taskOne);
+projectsArr.push('exercise');
+domRender.displayProjects(projectsArr);
+domRender.displayTasks(tasksArr);
 
-contentContainer.appendChild(taskOne);
+
 
 const deleteTask = (e) => {
     let taskName = e.target.dataset.delete;
@@ -31,7 +29,7 @@ const deleteTask = (e) => {
         // sort the array of all tasks by the timestamp they were added
         allTasks.sort((a, b) => a.taskAdded - b.taskAdded);
 
-        domRender.displayAllTasks(allTasks);
+        domRender.displayTasks(allTasks);
     } else {
         for (let key of Object.keys(projects)) {
            //if (projects[key].map(e => e.title).indexOf(taskName) > -1) {
@@ -70,7 +68,6 @@ const editTask = (e) => {
     }
 }
 
-// user input test
 const createTask = (e) => {
     e.preventDefault();
 
@@ -78,34 +75,25 @@ const createTask = (e) => {
     let completed = isCompleted ? true : false;
     let title = document.getElementById('title').value;
     let description = document.getElementById('desc').value;
-    let dueDate = format(new Date(document.getElementById('due').value), 'M/d/yyyy');
+    let dueDate = format(new Date(document.getElementById('due').value), 'yyyy-MM-dd');
     let priority = document.getElementById('priority').value;
     let project = document.getElementById('project').value;
 
-    let newTask = new Task(title, description, dueDate, priority, completed);
+    let newTask = new Task(title, description, dueDate, priority, project, completed);
     if (project) {
-        if (project in projects) {
-            projects[project].addTask(newTask);
-        } else {
-            let newProject = new Project(project, [newTask]);
-            projects[newProject.name] = newProject;
-            sideBarContainer.appendChild(domStuff.addProjectToDOM(newProject));
+        if (!projectsArr.includes(project)) {
+            projectsArr.push(project);
         }
-    } else {
-        remainingTasks.push(newTask);
-    }
+        domRender.displayProjects(projectsArr);
+    } 
+    tasksArr.push(newTask);
 
     if (project) {
-        domRender.displayProject(projects[project]);
+        let currentProjectTasks = tasksArr.filter(task => task.project == project);
+        domRender.displayTasks(currentProjectTasks);
     } else {
-        let allTasks = [...remainingTasks];
-        for (let prj in projects) {
-            allTasks.push(...projects[prj].tasks)
-        }
-        // sort the array of all tasks by the timestamp they were added
-        allTasks.sort((a, b) => a.taskAdded - b.taskAdded);
-
-        domRender.displayAllTasks(allTasks);
+        tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+        domRender.displayTasks(tasksArr);
     }
     
     newTaskForm.reset();
@@ -115,18 +103,6 @@ const createTask = (e) => {
     const editBtns = document.querySelectorAll(".edit-btn");
     editBtns.forEach(btn => addEventListener('click', editTask));
 }
-
-
-// title, description, dueDate, priority, completed)
-let exercise = new Project('exercise', []);
-projects.exercise = exercise;
-console.log(exercise);
-exercise.addTask(new Task('Go To Gym', '1 hour exercise', 'tomorrow', 'high', true));
-console.log(exercise.tasks);
-console.log(exercise);
-
-
-sideBarContainer.appendChild(domStuff.addProjectToDOM(exercise));
 
 newTaskForm.addEventListener('submit', createTask);
 
