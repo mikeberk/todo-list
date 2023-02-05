@@ -9,30 +9,13 @@ class Task {
         this.project = project;
     }
 
-    set setTitle(newTitle) {
+    set _title(newTitle) {
         if (newTitle === '') {
             console.log('The title cannot be empty');
             return;
         } 
-        return this._title = newTitle;
+        return this.title = newTitle;
     }
-
-    set setDescription(newDesc) {
-        return this._description = newDesc;
-    }
-
-    set setDueDate(newDueDate) {
-        return this._dueDate = newDueDate;
-    }
-
-    set setPriority(newPriority) {
-        return this._priority = newPriority;
-    }
-
-    set setProject(newProject) {
-        return this._project = newProject;
-    }
-
     // set completed 
 }
 

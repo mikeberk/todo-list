@@ -12,67 +12,6 @@ const domStuff = (() => {
         return newElement;
     }
 
-    const createEditForm = (task, proj) => {
-        //create form element
-        let editForm = document.createElement('form');
-        editForm.setAttribute('action', '#');
-        editForm.setAttribute('autocomplete', 'off');
-
-        //create input for task title
-        let editTitle = document.createElement('input');
-        editTitle.setAttribute('type', 'text');
-        editTitle.setAttribute('id', 'title');
-        editTitle.setAttribute('placeholder', task.title);
-        editTitle.setAttribute('name', 'title');
-        editTitle.setAttribute('required', '');
-
-        //create input for task description
-        let editDesc = document.createElement('input');
-        editDesc.setAttribute('type', 'text');
-        editDesc.setAttribute('id', 'desc');
-        editDesc.setAttribute('placeholder', task.description);
-        editDesc.setAttribute('name', 'desc');
-        editDesc.setAttribute('required', '');
-
-        //create input for task date
-        let editDate = document.createElement('input');
-        editDate.setAttribute('type', 'date');
-        editDate.setAttribute('id', 'due')
-        editDesc.setAttribute('name', 'due');
-        editDesc.setAttribute('placeholder', task.dueDate); //might need to mess with the date formatting
-
-        //create drop-down for priority
-        let options = ['None', 'High', 'Medium', 'Low'];
-        let editPriority = document.createElement('select');
-        editPriority.id = 'priority';
-        for (let i = 0; i < options.length; i++) {
-            let option = document.createElement('option');
-            option.value = options[i.toLowerCase()];
-            option.textContent = options[i];
-            editPriority.appendChild(option);
-        }
-
-        //create input for project
-        let editProject = document.createElement('input');
-        editProject.setAttribute('type', 'text');
-        editProject.setAttribute('id', 'project');
-        if (proj) editProject.setAttribute('placeholder', proj);
-        editProject.setAttribute('name', 'project');
-
-        //create submit button
-        let editSubmit = document.createHtmlElement('submit');
-        editSubmit.textContent = 'Ok';
-        editSubmit.classList.add('okay-btn');
-
-        let formNodes = [editTitle, editDesc, editDate, editPriority, editProject, editSubmit];
-        for (let i = 0; i < formNodes.length; i++) {
-            editForm.appendChild(formNodes[i]);
-        }
-
-        return editForm;
-
-    }
-
     const addTaskToDOM = (task) => {
         const todoItem = document.createElement('div');
 		todoItem.classList.add('todo-item');
@@ -113,10 +52,17 @@ const domStuff = (() => {
         }
         taskPrio.disabled = true;
 
+        const editBtn = createHtmlElement('button', 'Edit', 'edit-btn');
+        editBtn.dataset.edit = task.title;
+        const deleteBtn = createHtmlElement('button', 'Delete', 'delete-btn');
+        deleteBtn.dataset.delete = task.title;
+
         todoItem.appendChild(taskPrio);
         todoItem.appendChild(taskName);
         todoItem.appendChild(taskDesc);
         todoItem.appendChild(taskDue);
+        todoItem.appendChild(editBtn);
+        todoItem.appendChild(deleteBtn);
 
         return todoItem;
     }
@@ -159,11 +105,9 @@ const domStuff = (() => {
         return projectElem;
     }
 
-
     return {
         addTaskToDOM,
-        addProjectToDOM,
-        createEditForm
+        addProjectToDOM
     }
 })();
 

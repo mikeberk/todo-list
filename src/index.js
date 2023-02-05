@@ -14,59 +14,11 @@ tasksArr.push(taskOne);
 projectsArr.push('exercise');
 domRender.displayProjects(projectsArr);
 domRender.displayTasks(tasksArr);
+const deleteBtns = document.querySelectorAll(".delete-btn");
+deleteBtns.forEach(btn => btn.addEventListener('click', deleteTask));
 
-
-
-const deleteTask = (e) => {
-    let taskName = e.target.dataset.delete;
-    let remIndex = remainingTasks.map(e => e.title).indexOf(taskName);
-    if (remIndex > -1) {
-        remainingTasks.splice(remIndex, 1)
-        let allTasks = [...remainingTasks];
-        for (let prj in projects) {
-            allTasks.push(...projects[prj].tasks)
-        }
-        // sort the array of all tasks by the timestamp they were added
-        allTasks.sort((a, b) => a.taskAdded - b.taskAdded);
-
-        domRender.displayTasks(allTasks);
-    } else {
-        for (let key of Object.keys(projects)) {
-           //if (projects[key].map(e => e.title).indexOf(taskName) > -1) {
-           if (projects[key].indexOfTask(taskName) > -1) {
-            projects[key].removeTask(taskName)
-            domRender.displayProject(projects[key]);
-           }
-        }
-    }
-}
-
-const editTask = (e) => {
-    // target the relevant div.task-container
-    // remove children
-    // call function to build the edit form
-    // need another function for "save task"
-    // function for "cancel" that resets the form but does not modify the task properties and re-displays task to DOM
-    
-    let taskName = e.target.dataset.edit;
-    console.log(e.target.parentElement);
-
-
-    let remIndex = remainingTasks.map(e => e.title).indexOf(taskName);
-    if (remIndex > -1) {
-        let task = remainingTasks[remIndex];
-        domRender.displayEditForm(task);
-    } else {
-        for (let key of Object.keys(projects)) {
-            if (projects[key].indexOfTask(taskName) > -1) {
-
-                // set task equal to the task found in project's task array. need to figure out correct syntax
-                let task = projects[key].tasks[projects[key].indexOfTask(taskName)];
-                domRender.displayEditForm(task,projects[key]);
-            }
-        }
-    }
-}
+const editBtns = document.querySelectorAll(".edit-btn");
+editBtns.forEach(btn => btn.addEventListener('click', editTask));
 
 const createTask = (e) => {
     e.preventDefault();
@@ -95,16 +47,69 @@ const createTask = (e) => {
         tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
         domRender.displayTasks(tasksArr);
     }
+    const deleteBtns = document.querySelectorAll(".delete-btn");
+    deleteBtns.forEach(btn => btn.addEventListener('click', deleteTask));
     
     newTaskForm.reset();
-    const deleteBtns = document.querySelectorAll(".delete-btn");
-    deleteBtns.forEach(btn => addEventListener('click', deleteTask));
-
-    const editBtns = document.querySelectorAll(".edit-btn");
-    editBtns.forEach(btn => addEventListener('click', editTask));
 }
 
 newTaskForm.addEventListener('submit', createTask);
+
+function deleteTask(e) {
+    let taskName = e.target.dataset.delete;
+    let taskIndex = tasksArr.map(e => e.title).indexOf(taskName);
+    tasksArr.splice(taskIndex, 1);
+
+    // sort the array of all tasks by the timestamp they were added
+    tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+    domRender.displayTasks(tasksArr);
+}
+
+function editTask(e) {
+    let taskName = e.target.dataset.edit;
+    let taskIndex = tasksArr.map(e => e.title).indexOf(taskName);
+    let task = tasksArr[taskIndex];
+    e.target.textContent = 'Save'
+    e.target.removeEventListener('click', editTask);
+
+    const itemDiv = e.target.parentElement;
+    itemDiv.focus();
+    console.log(itemDiv);
+
+    const titleInput = itemDiv.querySelector('input[name=title]');
+    const descInput = itemDiv.querySelector('input[name=desc]');
+    const dueInput = itemDiv.querySelector('input[name=due]');
+    const select = itemDiv.querySelector('select');
+    const deleteButton = itemDiv.querySelector('.delete-btn');
+
+    titleInput.removeAttribute('readonly');
+    descInput.removeAttribute('readonly');
+    dueInput.removeAttribute('readonly');
+    select.removeAttribute('disabled');
+
+    e.target.addEventListener('click', (e) => {
+        e.preventDefault();
+        task._title = titleInput.value;
+        task.description = descInput.value;
+        task.dueDate = dueInput.value;
+        task.priority = select.value;
+        console.log(tasksArr);
+
+        titleInput.readOnly = true;
+        descInput.readOnly = true;
+        dueInput.readOnly = true;
+        select.disabled = true;
+
+        e.target.textContent = 'Edit';
+        e.target.dataset.edit = task.title;
+        deleteButton.dataset.delete = task.title;
+        e.target.addEventListener('click', editTask);
+        // need to add the project input
+        // re-render tasks on save or just make all attributes readonly and swap the event listener on the save/edit btn?
+        
+    })
+}
+
 
 /*
 + Need to add data attribute to each task and project that corresponds to the index in the respective array
