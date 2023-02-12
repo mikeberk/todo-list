@@ -16,11 +16,22 @@ const domStuff = (() => {
         const todoItem = document.createElement('div');
 		todoItem.classList.add('todo-item');
 
+        const statusWrapper = document.createElement('div');
+        statusWrapper.classList.add('check-wrap');
+        const taskStatus = document.createElement('input');
+        taskStatus.setAttribute('type', 'checkbox');
+        taskStatus.setAttribute('name', 'status');
+        taskStatus.checked = task.completed;
+        statusWrapper.appendChild(taskStatus);
+
         const taskName = document.createElement('input');
         taskName.setAttribute('type', 'text');
         taskName.setAttribute('name', 'title');
         taskName.value = task.title;
         taskName.readOnly = true;
+        if (task.completed) {
+            taskName.classList.add('completed');
+        }
 
         const taskDesc = document.createElement('input');
         taskDesc.setAttribute('type', 'text');
@@ -31,7 +42,12 @@ const domStuff = (() => {
         const taskDue = document.createElement('input');
         taskDue.setAttribute('type', 'date');
         taskDue.setAttribute('name', 'due');
-        taskDue.value = task.dueDate;
+        if (task.dueDate !== '') {
+            taskDue.value = task.dueDate;
+        }
+        if (task.dueDate === '') {
+            taskDue.hidden = true;
+        }
         taskDue.readOnly = true;
 
         const taskPrio = document.createElement('select');
@@ -50,17 +66,42 @@ const domStuff = (() => {
               break;
             }
         }
+
+        const taskProject = document.createElement('input');
+        taskProject.setAttribute('type', 'text');
+        taskProject.setAttribute('name', 'project');
+        taskProject.value = task.project;
+        taskProject.readOnly = true;
+
+
+        let priorityIndicator = document.createElement('p');
+        priorityIndicator.textContent = task.priority == 'high' ? '!!!'
+        : task.priority == 'medium' ? '!!'
+        : task.priority == 'low' ? '!'
+        : '';
+        priorityIndicator.classList.add('indicator');
+
         taskPrio.disabled = true;
+        taskPrio.classList = 'hidden';
+        taskPrio.hidden = true;
 
         const editBtn = createHtmlElement('button', 'Edit', 'edit-btn');
         editBtn.dataset.edit = task.title;
         const deleteBtn = createHtmlElement('button', 'Delete', 'delete-btn');
         deleteBtn.dataset.delete = task.title;
 
+        taskStatus.addEventListener('change', (e) => {
+            task.completed = e.target.checked;
+            taskName.classList.toggle('completed');
+        })
+
         todoItem.appendChild(taskPrio);
+        todoItem.appendChild(priorityIndicator);
         todoItem.appendChild(taskName);
+        todoItem.appendChild(statusWrapper);
         todoItem.appendChild(taskDesc);
         todoItem.appendChild(taskDue);
+        todoItem.appendChild(taskProject);
         todoItem.appendChild(editBtn);
         todoItem.appendChild(deleteBtn);
 
@@ -101,8 +142,28 @@ const domStuff = (() => {
 */
     const addProjectToDOM = (project) => {
         //project.name
+        let projectElemWrapper = createHtmlElement('div', '', 'project-wrapper');
         let projectElem = createHtmlElement('p', project, 'project-name');
-        return projectElem;
+        let trashElem = createHtmlElement('span', 'delete_outline', 'material-icons');
+        trashElem.classList.add('trash-can');
+        projectElemWrapper.appendChild(projectElem)
+        projectElemWrapper.appendChild(trashElem);
+
+        function showTrashCan(e) {
+            if (e.target.classList.contains('project-wrapper')) {
+                e.target.classList.add('show-trash-can');
+            }
+        }
+
+        function hideTrashCan(e) {
+            if (e.target.classList.contains('project-wrapper')) {
+                e.target.classList.remove('show-trash-can');
+            }
+        }
+
+        projectElemWrapper.addEventListener('mouseover', showTrashCan);
+        projectElemWrapper.addEventListener('mouseleave', hideTrashCan);
+        return projectElemWrapper;
     }
 
     return {

@@ -4,6 +4,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -17,19 +19,23 @@
         </div>
         <div class="task-area">
             <div id="content"></div>
-            <div class="new-task">
+            <span class="material-icons md-36 power-ball">
+                add_circle_outline
+                </span>                
+            <div class="new-task undisplayed">
                 <form class="new-task-form" action="#" autocomplete="off">
                     <label for="title">
                         <input type="text" id="title" placeholder="New Task" name="title" required>
                     </label>
                     <label for="desc">
-                        <input type="text" id="desc" placeholder="Description" name="desc" required>
+                        <input type="text" id="desc" placeholder="Description" name="desc">
                     </label>
                     <label for="due">
                         <input type="date" id="due" name="due">
                     </label>
                     <label for="priority">
                         <select name="priority" id="priority">
+                            <option value="" selected disabled hidden>Priority</option>
                             <option value="none">None</option>
                             <option value="high">High</option>
                             <option value="medium">Medium</option>
@@ -38,9 +44,6 @@
                     </label>
                     <label for="project">
                         <input type="text" id="project" placeholder="Project" name="project">
-                    </label>
-                    <label for="completed">
-                        <input class="completed" type="checkbox" id="completed" name="completed">
                     </label>
                     <button type="submit">Add Task</button>
                     <button type="reset" class="close">Cancel</button>
