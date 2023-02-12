@@ -12,17 +12,17 @@ powerball.addEventListener('click', toggleForm);
 cancelBtn.addEventListener('click', toggleForm);
 
 // initialize projects and tasks arrays. when moving to local store, update to seed with existing tasks/projects
-let projectsArr = [];
-let tasksArr = [];
+//let globalVars.projectsArr = [];
+//let globalVars.tasksArr = [];
 // create a global reference to current project/page
-let currentDisplay = 'default';
+//let globalVars.currentDisplay = 'default';
 
 // static test
 let taskOne = new Task('Go To Gym', '1 hour exercise', '', 'high', 'exercise', false);
-tasksArr.push(taskOne);
-projectsArr.push('exercise');
-domRender.displayProjects(projectsArr);
-domRender.displayTasks(tasksArr);
+globalVars.tasksArr.push(taskOne);
+globalVars.projectsArr.push('exercise');
+domRender.displayProjects(globalVars.projectsArr);
+domRender.displayTasks(globalVars.tasksArr);
 const deleteBtns = document.querySelectorAll(".delete-btn");
 deleteBtns.forEach(btn => btn.addEventListener('click', deleteTask));
 
@@ -43,21 +43,21 @@ const createTask = (e) => {
 
     let newTask = new Task(title, description, dueDate, priority, project, completed);
     if (project) {
-        if (!projectsArr.includes(project)) {
-            projectsArr.push(project);
+        if (!globalVars.projectsArr.includes(project)) {
+            globalVars.projectsArr.push(project);
         }
-        domRender.displayProjects(projectsArr);
+        domRender.displayProjects(globalVars.projectsArr);
     } 
-    tasksArr.push(newTask);
+    globalVars.tasksArr.push(newTask);
 
     if (project) {
-        let currentProjectTasks = tasksArr.filter(task => task.project == project);
+        let currentProjectTasks = globalVars.tasksArr.filter(task => task.project == project);
         domRender.displayTasks(currentProjectTasks);
-        currentDisplay = project;
+        globalVars.currentDisplay = project;
     } else {
-        tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
-        domRender.displayTasks(tasksArr);
-        currentDisplay = 'default';
+        globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+        domRender.displayTasks(globalVars.tasksArr);
+        globalVars.currentDisplay = 'default';
     }
     const deleteBtns = document.querySelectorAll(".delete-btn");
     deleteBtns.forEach(btn => btn.addEventListener('click', deleteTask));
@@ -69,21 +69,23 @@ const createTask = (e) => {
     toggleForm();
     const projects = document.querySelectorAll('.project-name')
     projects.forEach(proj => proj.addEventListener('click', switchProject));
+    //window.localStorage.setItem('tasks', JSON.stringify(globalVars.tasksArr));
+    //console.log(JSON.parse(window.localStorage.getItem('tasks')));
 }
 
 newTaskForm.addEventListener('submit', createTask);
 
 function deleteTask(e) {
     let taskName = e.target.dataset.delete;
-    let taskIndex = tasksArr.map(e => e.title).indexOf(taskName);
-    tasksArr.splice(taskIndex, 1);
+    let taskIndex = globalVars.tasksArr.map(e => e.title).indexOf(taskName);
+    globalVars.tasksArr.splice(taskIndex, 1);
 
-    if (currentDisplay !== 'default') {
-        let currentProjectTasks = tasksArr.filter(task => task.project == currentDisplay);
+    if (globalVars.currentDisplay !== 'default') {
+        let currentProjectTasks = globalVars.tasksArr.filter(task => task.project == globalVars.currentDisplay);
         domRender.displayTasks(currentProjectTasks);
     } else {
-        tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
-        domRender.displayTasks(tasksArr);
+        globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+        domRender.displayTasks(globalVars.tasksArr);
     }
  
     const deleteBtns = document.querySelectorAll(".delete-btn");
@@ -95,8 +97,8 @@ function deleteTask(e) {
 
 function editTask(e) {
     let taskName = e.target.dataset.edit;
-    let taskIndex = tasksArr.map(e => e.title).indexOf(taskName);
-    let task = tasksArr[taskIndex];
+    let taskIndex = globalVars.tasksArr.map(e => e.title).indexOf(taskName);
+    let task = globalVars.tasksArr[taskIndex];
     e.target.textContent = 'Save'
     e.target.removeEventListener('click', editTask);
 
@@ -132,10 +134,10 @@ function editTask(e) {
         task.priority = select.value;
 
         if (task.project !== projectInput.value) {
-            if (!projectsArr.includes(projectInput.value)) {
-                projectsArr.push(projectInput.value);
+            if (!globalVars.projectsArr.includes(projectInput.value)) {
+                globalVars.projectsArr.push(projectInput.value);
             }
-            domRender.displayProjects(projectsArr);
+            domRender.displayProjects(globalVars.projectsArr);
             const projects = document.querySelectorAll('.project-name')
             projects.forEach(proj => proj.addEventListener('click', switchProject));
             // const wrappers = document.querySelectorAll('project-wrapper');
@@ -174,8 +176,8 @@ function editTask(e) {
 }
 
 function toggleForm() {
-    if (currentDisplay !== 'default') {
-        document.getElementById('project').value = currentDisplay;
+    if (globalVars.currentDisplay !== 'default') {
+        document.getElementById('project').value = globalVars.currentDisplay;
     } else {
         document.getElementById('project').value = '';
     }
@@ -186,12 +188,12 @@ function toggleForm() {
 function switchProject(e) {
     let projectClicked = e.target.textContent;
     if (projectClicked == 'All Tasks') {
-        tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
-        domRender.displayTasks(tasksArr);
-        currentDisplay = 'default';
+        globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+        domRender.displayTasks(globalVars.tasksArr);
+        globalVars.currentDisplay = 'default';
     } else {
-        domRender.displayTasks(tasksArr.filter(t => t.project == projectClicked));
-        currentDisplay = projectClicked;
+        domRender.displayTasks(globalVars.tasksArr.filter(t => t.project == projectClicked));
+        globalVars.currentDisplay = projectClicked;
     }
     
     const deleteBtns = document.querySelectorAll(".delete-btn");
@@ -201,19 +203,7 @@ function switchProject(e) {
 }
 
 // move this to domRender.js after local storage buildout
-function deleteProject(e) {
-    let projectToDelete = e.target.previousElementSibling.textContent;
-    let filteredTasks = tasksArr.filter(t => t.project == projectToDelete);
-    for (let i = 0; i < filteredTasks.length; i++) {
-        filteredTasks[i].project = '';
-    }
-    let projectsIndex = projectsArr.indexOf(projectToDelete);
-    projectsArr.splice(projectsIndex, 1);
-    domRender.displayProjects(projectsArr);
-    if (currentDisplay == projectToDelete) {
-        domRender.displayTasks(tasksArr.sort((a, b) => a.taskAdded - b.taskAdded));
-    }
-}
+
 
 
 // REMAINING TASKS

@@ -1,4 +1,6 @@
 import { format } from "date-fns";
+import globalVars from "./globals";
+import { domRender } from "./domRender";
 
 const domStuff = (() => {
     const createHtmlElement = (tag, text, className) => {
@@ -10,6 +12,20 @@ const domStuff = (() => {
             newElement.classList.add(className);
         }
         return newElement;
+    }
+
+    const deleteProject = (e) => {
+        let projectToDelete = e.target.previousElementSibling.textContent;
+        let filteredTasks = globalVars.tasksArr.filter(t => t.project == projectToDelete);
+        for (let i = 0; i < filteredTasks.length; i++) {
+            filteredTasks[i].project = '';
+        }
+        let projectsIndex = globalVars.projectsArr.indexOf(projectToDelete);
+        globalVars.projectsArr.splice(projectsIndex, 1);
+        domRender.displayProjects(globalVars.projectsArr);
+        if (globalVars.currentDisplay == projectToDelete) {
+            domRender.displayTasks(globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded));
+        }
     }
 
     const addTaskToDOM = (task) => {
@@ -163,6 +179,7 @@ const domStuff = (() => {
 
         projectElemWrapper.addEventListener('mouseover', showTrashCan);
         projectElemWrapper.addEventListener('mouseleave', hideTrashCan);
+        trashElem.addEventListener('click', deleteProject);
         return projectElemWrapper;
     }
 
