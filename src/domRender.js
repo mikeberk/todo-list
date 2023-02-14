@@ -14,7 +14,7 @@ const domRender = (() => {
     const displayProjects = (projects) => {
         sideBarContainer.innerHTML =
             `<h3>Projects</h3>
-            <div class="project-wrapper"><p class="project-name">All Tasks</p></div>`;
+            <div class="project-wrapper"><span class="material-icons project-icon">task</span><p class="project-name">All Tasks</p></div>`;
         projects.forEach(p => sideBarContainer.appendChild(domStuff.addProjectToDOM(p)));
     }
 
@@ -25,6 +25,8 @@ const domRender = (() => {
             }
         }
         tasks.forEach(task => contentContainer.appendChild(domStuff.addTaskToDOM(task)));
+        let textFields = contentContainer.querySelectorAll('input[type="text"]');
+        textFields.forEach(f => f.setAttribute('autocomplete', 'off'));
     }
 
     const toggleForm = (el) => {
@@ -38,4 +40,4 @@ const domRender = (() => {
     }
 })();
 
-export { domRender }
+export { domRender };

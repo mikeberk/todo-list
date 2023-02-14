@@ -1,6 +1,8 @@
 import { format } from "date-fns";
-import globalVars from "./globals";
+import { globalVars } from "./globals";
 import { domRender } from "./domRender";
+
+const projectHeader = document.querySelector('.current-project');
 
 const domStuff = (() => {
     const createHtmlElement = (tag, text, className) => {
@@ -16,15 +18,26 @@ const domStuff = (() => {
 
     const deleteProject = (e) => {
         let projectToDelete = e.target.previousElementSibling.textContent;
-        let filteredTasks = globalVars.tasksArr.filter(t => t.project == projectToDelete);
+        let tasksArr = [];
+        tasksArr.push(...globalVars.getTasks());
+        let filteredTasks = tasksArr.filter(t => t.project == projectToDelete);
         for (let i = 0; i < filteredTasks.length; i++) {
             filteredTasks[i].project = '';
         }
-        let projectsIndex = globalVars.projectsArr.indexOf(projectToDelete);
-        globalVars.projectsArr.splice(projectsIndex, 1);
-        domRender.displayProjects(globalVars.projectsArr);
+        globalVars.setTasks(tasksArr);
+
+        let projectsArr = [];
+        projectsArr.push(...globalVars.getProjects());
+        let projectsIndex = projectsArr.indexOf(projectToDelete);
+        projectsArr.splice(projectsIndex, 1);
+        globalVars.setProjects(projectsArr);
+        domRender.displayProjects(globalVars.getProjects());
         if (globalVars.currentDisplay == projectToDelete) {
-            domRender.displayTasks(globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded));
+            let tasks = [];
+            tasks.push(...globalVars.getTasks());
+            domRender.displayTasks(tasks.sort((a, b) => a.taskAdded - b.taskAdded));
+            globalVars.currentDisplay = 'default';
+            projectHeader.textContent = 'All Tasks';
         }
         const projects = document.querySelectorAll('.project-name')
         projects.forEach(proj => proj.addEventListener('click', switchProject));
@@ -109,8 +122,14 @@ const domStuff = (() => {
         deleteBtn.dataset.delete = task.title;
 
         taskStatus.addEventListener('change', (e) => {
-            task.completed = e.target.checked;
+            let title = e.target.parentElement.previousElementSibling.value;
+            let tasks = [];
+            tasks.push(...globalVars.getTasks());
+            let thisTaskIndex = tasks.map(e => e.title).indexOf(title);
+            let thisTask = tasks[thisTaskIndex];
+            thisTask.completed = e.target.checked;
             taskName.classList.toggle('completed');
+            globalVars.setTasks(tasks);
         })
 
         todoItem.appendChild(taskPrio);
@@ -125,50 +144,23 @@ const domStuff = (() => {
 
         return todoItem;
     }
-/*
-    const addTaskToDOM = (task) => {
-        // use createHtmlElement to add each task prop to a container
-        // props: title, description, dueDate, priority, completed
-        let priority = task.priority == 'high' ? '!!!'
-            : task.priority == 'medium' ? '!!'
-            : task.priority == 'low' ? '!'
-            : '';
-        
-
-        let taskName = createHtmlElement('p', task.title, 'task-title');
-        let taskDesc = createHtmlElement('p', task.description, 'task-description');
-        let taskDue = createHtmlElement('p', task.dueDate, 'task-due');
-        let taskPrio = createHtmlElement('p', priority, 'task-prio');
-        let taskCompleted = createHtmlElement('p', task.completed, 'task-completed');
-
-        let editBtn = createHtmlElement('button', 'Edit', 'edit-btn');
-        editBtn.dataset.edit = task.title;
-        let deleteBtn = createHtmlElement('button', 'Delete', 'delete-btn');
-        deleteBtn.dataset.delete = task.title;
-
-        let taskContainer = createHtmlElement('div', null, 'task-container');
-        taskContainer.appendChild(taskPrio);
-        taskContainer.appendChild(taskName);
-        taskContainer.appendChild(taskDesc);
-        taskContainer.appendChild(taskDue);
-        taskContainer.appendChild(taskCompleted);
-        taskContainer.appendChild(editBtn);
-        taskContainer.appendChild(deleteBtn);
-
-        return taskContainer;
-    }
-*/
+ 
     const deleteTask = (e) => {
         let taskName = e.target.dataset.delete;
-        let taskIndex = globalVars.tasksArr.map(e => e.title).indexOf(taskName);
-        globalVars.tasksArr.splice(taskIndex, 1);
+        let updatedTasks = [];
+        updatedTasks.push(...globalVars.getTasks());
+        let taskIndex = updatedTasks.map(e => e.title).indexOf(taskName);
+        updatedTasks.splice(taskIndex, 1);
+        globalVars.setTasks(updatedTasks);
 
+        let newTasksArr = [];
+        newTasksArr.push(...globalVars.getTasks());
         if (globalVars.currentDisplay !== 'default') {
-            let currentProjectTasks = globalVars.tasksArr.filter(task => task.project == globalVars.currentDisplay);
+            let currentProjectTasks = newTasksArr.filter(task => task.project == globalVars.currentDisplay);
             domRender.displayTasks(currentProjectTasks);
         } else {
-            globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
-            domRender.displayTasks(globalVars.tasksArr);
+            let sortedTasks = newTasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+            domRender.displayTasks(sortedTasks);
         }
     
         const deleteBtns = document.querySelectorAll(".delete-btn");
@@ -180,8 +172,10 @@ const domStuff = (() => {
 
     const editTask = (e) => {
         let taskName = e.target.dataset.edit;
-        let taskIndex = globalVars.tasksArr.map(e => e.title).indexOf(taskName);
-        let task = globalVars.tasksArr[taskIndex];
+        let tasksArr = []
+        tasksArr.push(...globalVars.getTasks());
+        let taskIndex = tasksArr.map(e => e.title).indexOf(taskName);
+        let task = tasksArr[taskIndex];
         e.target.textContent = 'Save'
         e.target.removeEventListener('click', editTask);
 
@@ -217,17 +211,18 @@ const domStuff = (() => {
             task.priority = select.value;
 
             if (task.project !== projectInput.value) {
-                if (!globalVars.projectsArr.includes(projectInput.value)) {
-                    globalVars.projectsArr.push(projectInput.value);
+                let projectsArr = [...globalVars.getProjects()];
+                if (!projectsArr.includes(projectInput.value)) {
+                    let updatedProjects = [...globalVars.getProjects()]
+                    updatedProjects.push(projectInput.value);
+                    globalVars.setProjects(updatedProjects);
                 }
-                domRender.displayProjects(globalVars.projectsArr);
+                domRender.displayProjects(globalVars.getProjects());
                 const projects = document.querySelectorAll('.project-name')
                 projects.forEach(proj => proj.addEventListener('click', switchProject));
-                // const wrappers = document.querySelectorAll('project-wrapper');
-                // wrappers.forEach(div => div.addEventListener('mouseover', toggleTrashCan));
-                // wrappers.forEach(div => div.addEventListener('mouseleave', toggleTrashCan));
             } 
             task.project = projectInput.value;
+            globalVars.setTasks(tasksArr);
 
             titleInput.readOnly = true;
             descInput.readOnly = true;
@@ -252,21 +247,25 @@ const domStuff = (() => {
             e.target.dataset.edit = task.title;
             deleteButton.dataset.delete = task.title;
             e.target.addEventListener('click', editTask);
-            // need to add the project input
-            // re-render tasks on save or just make all attributes readonly and swap the event listener on the save/edit btn?
-            
         })
     }
 
     const switchProject = (e) => {
         let projectClicked = e.target.textContent;
         if (projectClicked == 'All Tasks') {
-            globalVars.tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
-            domRender.displayTasks(globalVars.tasksArr);
+            let tasksArr = [];
+            tasksArr.push(...globalVars.getTasks());
+            let sortedTasks = tasksArr.sort((a, b) => a.taskAdded - b.taskAdded);
+            domRender.displayTasks(sortedTasks);
             globalVars.currentDisplay = 'default';
+            projectHeader.textContent = 'All Tasks';
         } else {
-            domRender.displayTasks(globalVars.tasksArr.filter(t => t.project == projectClicked));
+            let tasksArr = [];
+            tasksArr.push(...globalVars.getTasks())
+            let filteredTasks = tasksArr.filter(t => t.project == projectClicked);
+            domRender.displayTasks(filteredTasks);
             globalVars.currentDisplay = projectClicked;
+            projectHeader.textContent = projectClicked;
         }
         
         const deleteBtns = document.querySelectorAll(".delete-btn");
@@ -276,11 +275,13 @@ const domStuff = (() => {
     }
 
     const addProjectToDOM = (project) => {
-        //project.name
         let projectElemWrapper = createHtmlElement('div', '', 'project-wrapper');
+        let projectIcon = createHtmlElement('span', 'checklist', 'material-icons');
         let projectElem = createHtmlElement('p', project, 'project-name');
         let trashElem = createHtmlElement('span', 'delete_outline', 'material-icons');
         trashElem.classList.add('trash-can');
+        projectIcon.classList.add('project-icon');
+        projectElemWrapper.appendChild(projectIcon);
         projectElemWrapper.appendChild(projectElem)
         projectElemWrapper.appendChild(trashElem);
 
@@ -307,8 +308,9 @@ const domStuff = (() => {
         addTaskToDOM,
         addProjectToDOM,
         editTask,
-        deleteTask
+        deleteTask,
+        switchProject
     }
 })();
 
-export { domStuff }
+export { domStuff };

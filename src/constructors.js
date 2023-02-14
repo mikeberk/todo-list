@@ -1,11 +1,11 @@
 class Task {
-    constructor(title, description, dueDate, priority, project, completed) {
+    constructor(title, description, dueDate, priority, project, completed, taskAdded = Date.now()) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
         this.priority = priority;
         this.completed = completed;
-        this.taskAdded = Date.now();
+        this.taskAdded = taskAdded;
         this.project = project;
     }
 
@@ -16,7 +16,6 @@ class Task {
         } 
         return this.title = newTitle;
     }
-    // set completed 
 }
 
 export { Task };
