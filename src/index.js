@@ -13,25 +13,31 @@ const projectHeader = document.querySelector('.current-project');
 powerball.addEventListener('click', toggleForm);
 cancelBtn.addEventListener('click', toggleForm);
 
-window.localStorage.clear();
-// static test
-let taskOne = new Task('Go To Gym', '1 hour exercise', '', 'high', 'exercise', false);
+// Initialize projects and tasks from local storage
+let initTaks = [];
+let initProjects = [];
+if (localStorage.getItem('tasks')) {
+    initTaks.push(...globalVars.getTasks());
+}
+if (localStorage.getItem('projects')) {
+    initProjects.push(...globalVars.getProjects());
+}
 
-let updatedTasks = [];
-updatedTasks.push(taskOne);
-globalVars.setTasks(updatedTasks);
+// Populate DOM with local sotrage takss and projects
+domRender.displayTasks(initTaks);
+domRender.displayProjects(initProjects);
 
-let updatedProjects = [];
-updatedProjects.push('exercise');
-globalVars.setProjects(updatedProjects);
-
-domRender.displayProjects([...globalVars.getProjects()]);
-domRender.displayTasks([...globalVars.getTasks()]);
 const deleteBtns = document.querySelectorAll(".delete-btn");
 deleteBtns.forEach(btn => btn.addEventListener('click', domStuff.deleteTask));
-
 const editBtns = document.querySelectorAll(".edit-btn");
 editBtns.forEach(btn => btn.addEventListener('click', domStuff.editTask));
+
+const projects = document.querySelectorAll('.project-name');
+projects.forEach(proj => proj.addEventListener('click', domStuff.switchProject));
+
+// set local storage projects and tasks in the case where the page loads without either initialized
+globalVars.setProjects(initProjects);
+globalVars.setTasks(initTaks);
 
 const createTask = (e) => {
     e.preventDefault();
